@@ -39,7 +39,6 @@ plugins=(
   colored-man-pages
   colorize
   command-not-found
-  common-aliases
   copybuffer
   docker
   emoji
