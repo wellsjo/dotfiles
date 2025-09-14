@@ -73,7 +73,6 @@ setup_git() {
 # Symlink bash dotfiles
 setup_zsh() {
   symlink ${dir}/zshrc ${HOME}/.zshrc
-  symlink ${dir}/zsh/agnoster-modified.zsh-theme ${HOME}/.oh-my-zsh/custom/themes/agnoster-modified.zsh-theme
 }
 
 clean_symlinks
