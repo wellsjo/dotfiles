@@ -47,5 +47,7 @@ tmux
 ```
 
 9. Move aliases/exports to `~/.localprofile`
+`.zshrc` sources this file if it exists.
 
 10. Restart terminal, test tmux alias with `t`
+If tmux starts, and there are no errors, that means zsh is working correctly.
