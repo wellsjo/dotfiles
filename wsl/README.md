@@ -41,12 +41,11 @@ chsh -s $(which zsh)
 
 8. Install tmux plugins
 ```bash
-# enter tmux (test alias)
+# enter tmux
 tmux
+# Now enter: `Ctrl + b` followed by `I`
 ```
-Then enter: `Ctrl + b` followed by `I`
 
-9. Move aliases/exports to ~/.localprofile
+9. Move aliases/exports to `~/.localprofile`
 
-10. Restart terminal
-Test starting tmux with `t`
+10. Restart terminal, test tmux alias with `t`
