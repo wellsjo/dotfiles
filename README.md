@@ -1,10 +1,12 @@
-## MacOS dotfiles
+## MacOS Setup
 
 ### Configs
 - zsh
 - vim
 - tmux
 - git
+
+TODO make step by step instructions
 
 ### Dependencies
 - oh-my-zsh
@@ -26,6 +28,11 @@ Paste this in the terminal
 git clone git@github.com:wellsjo/dotfiles.git ~/.dotfiles; ~/.dotfiles/setup
 ```
 
+### Install Nerd Fonts
+Set font to `MonaspaceNe Nerd Font Mono`
 ```
+brew install --cask font-monaspace-nerd-font font-noto-sans-symbols-2
+brew install bc coreutils gawk gh glab gsed jq nowplaying-cli
+```
+
 make sure /usr/local/bin comes before /usr/bin in $PATH
-```
