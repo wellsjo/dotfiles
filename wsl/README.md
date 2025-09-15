@@ -51,3 +51,7 @@ tmux
 
 10. Restart terminal, test tmux alias with `t`
 If tmux starts, and there are no errors, that means zsh is working correctly.
+
+
+11. Download & install `MonaspaceNe Nerd Font Mono`, set terminal to use that
+`https://github.com/ryanoasis/nerd-fonts/releases`
