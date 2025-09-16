@@ -17,10 +17,11 @@ mkdir -p ~/.zsh
 git clone https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 ```
 
-4. Create symlinks
+4. Setup configs
 ```bash
 ln -s ~/.dotfiles/wsl/zshrc ~/.zshrc
 ln -s ~/.dotfiles/vimrc ~/.vimrc
+ln -s ~/.dotfiles/vim ~/.vim
 ln -s ~/.dotfiles/tmux/tmux.conf ~/.tmux.conf
 ```
 
@@ -31,7 +32,7 @@ vim +PlugInstall +qall +silent
 
 6. Install oh-my-zsh
 ```bash
-sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
 7. Change shell to zsh
@@ -41,6 +42,8 @@ chsh -s $(which zsh)
 
 8. Install tmux plugins
 ```bash
+mkdir -p ~/.tmux/plugins
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 # enter tmux
 tmux
 # Now enter: `Ctrl + b` followed by `I`
