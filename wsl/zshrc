@@ -59,6 +59,10 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
+# FZF
+source /usr/share/doc/fzf/examples/key-bindings.zsh
+source /usr/share/doc/fzf/examples/completion.zsh
+
 # User configuration
 export LANG=en_US.UTF-8
 export EDITOR='vim'
