@@ -1,4 +1,19 @@
-## MacOS Setup
+## Project Structure
+
+```
+dotfiles/
+├── zshrc, vimrc, gitconfig, ...   # macOS configs (default)
+├── wsl/                            # WSL/Linux-specific overrides
+│   └── zshrc                       # Use this instead of root zshrc on WSL
+├── vim/                            # Vim plugins/config
+└── tmux/                           # Tmux config
+```
+
+**Key:** Root configs are for macOS. The `wsl/` directory contains Linux/WSL-specific versions where needed (e.g., `ls` vs `gls`).
+
+---
+
+## macOS Setup
 
 ### Configs
 - zsh
