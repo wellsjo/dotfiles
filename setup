@@ -60,12 +60,19 @@ symlink() {
   local source="$1"
   local target="$2"
   local backup
+  local current_target
 
   mkdir -p "$(dirname "$target")"
 
   if [[ -L "$target" ]]; then
-    rm "$target"
-  elif [[ -e "$target" ]]; then
+    current_target="$(readlink "$target")"
+    if [[ "$current_target" == "$source" ]]; then
+      echo "$target already points to $source"
+      return 0
+    fi
+  fi
+
+  if [[ -e "$target" || -L "$target" ]]; then
     if ! confirm_replace "$target"; then
       echo "Skipping $target"
       return 0
