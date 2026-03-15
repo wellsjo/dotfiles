@@ -1,83 +1,133 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-# Make sure this script is run from the same directory
-dir=`pwd`
-if [ ! -e "${dir}/$(basename $0)"  ]; then
-  echo "Script not called from within repository directory. Aborting."
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+force=false
+
+usage() {
+  cat <<'EOF'
+Usage: ./setup [--force] [--help]
+
+Options:
+  --force   Replace managed files without prompting
+  --help    Show this help message
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --force)
+      force=true
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+if [[ ! -e "${script_dir}/$(basename "$0")" ]]; then
+  echo "Script directory could not be resolved. Aborting." >&2
   exit 2
 fi
 
-# Symlink helper function
+backup_path() {
+  local target="$1"
+  local timestamp
+  timestamp="$(date +%Y%m%d-%H%M%S)"
+  echo "${target}.backup.${timestamp}"
+}
+
+confirm_replace() {
+  local target="$1"
+
+  if [[ "$force" == true ]]; then
+    return 0
+  fi
+
+  read -r -p "Replace ${target}? [y/N] " reply
+  [[ "$reply" =~ ^[Yy]$ ]]
+}
+
 symlink() {
-  # If this isnt a symlink (and the file exists)
-  if [ ! -L "$2" ] && [ -f "$2" ]; then
-    # Backup the file
-    mv "$2" "$2.backup" >/dev/null 2>&1
-    echo -e "$2 --> $2.backup"
+  local source="$1"
+  local target="$2"
+  local backup
 
-    # Now remove it, dirs too
-    rm -rf "$2" >/dev/null 2>&1
+  mkdir -p "$(dirname "$target")"
+
+  if [[ -L "$target" ]]; then
+    rm "$target"
+  elif [[ -e "$target" ]]; then
+    if ! confirm_replace "$target"; then
+      echo "Skipping $target"
+      return 0
+    fi
+
+    backup="$(backup_path "$target")"
+    mv "$target" "$backup"
+    echo "$target --> $backup"
   fi
 
-  # If this isnt a symlink (and the file exists)
-  if [ ! -L "$2" ] && [ -d "$2" ]; then
-    # Backup the file
-    mv "$2" "$2.backup" >/dev/null 2>&1
-    echo -e "$2 --> $2.backup"
+  ln -s "$source" "$target"
+  echo "$source --> $target"
+}
 
-    # Now remove it, dirs too
-    rm -rf "$2" >/dev/null 2>&1
+install_pure_prompt() {
+  if command -v npm >/dev/null 2>&1; then
+    npm install --global pure-prompt
+  else
+    echo "Skipping pure-prompt install: npm not found"
   fi
-
-  # If the target is already a symlink
-  if [ -L "$2" ]; then
-    rm "$2" >/dev/null 2>&1
-  fi
-
-  # Create symlink
-  ln -s $1 $2
-  echo -e "$1 --> $2"
 }
 
-# Removes broken symlinks
-clean_symlinks() {
-  find -L . -maxdepth 1 -type l -exec rm -- {} +
-}
-
-setup_prompt() {
-  npm install --global pure-prompt
-}
-
-# Install vim and plugins
 setup_vim() {
-  symlink ${dir}/vimrc ${HOME}/.vimrc
-  symlink ${dir}/vim ${HOME}/.vim
-  vim +PlugInstall +qall +silent
+  symlink "${script_dir}/vimrc" "${HOME}/.vimrc"
+  symlink "${script_dir}/vim" "${HOME}/.vim"
+
+  if command -v vim >/dev/null 2>&1; then
+    echo "Vim config linked. Run 'vim +PlugInstall +qall' when you're ready to install plugins."
+  else
+    echo "Skipping Vim plugin guidance: vim not found"
+  fi
 }
 
 setup_tmux() {
-  rm -rf ~/.tmux/plugins
-  mkdir -p ~/.tmux/plugins
-  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-  symlink ${dir}/tmux/tmux.conf ${HOME}/.tmux.conf
-  ~/.tmux/plugins/tpm/scripts/install_plugins.sh
+  symlink "${script_dir}/tmux/tmux.conf" "${HOME}/.tmux.conf"
+
+  if ! command -v git >/dev/null 2>&1; then
+    echo "Skipping TPM install: git not found"
+    return 0
+  fi
+
+  mkdir -p "${HOME}/.tmux/plugins"
+  if [[ ! -d "${HOME}/.tmux/plugins/tpm/.git" ]]; then
+    git clone https://github.com/tmux-plugins/tpm "${HOME}/.tmux/plugins/tpm"
+  else
+    git -C "${HOME}/.tmux/plugins/tpm" pull --ff-only
+  fi
+
+  echo "TPM installed. Start tmux and press prefix + I to install tmux plugins."
 }
 
 setup_git() {
-  symlink ${dir}/gitconfig ${HOME}/.gitconfig
-  symlink ${dir}/gitignore_global ${HOME}/.gitignore_global
+  symlink "${script_dir}/gitconfig" "${HOME}/.gitconfig"
+  symlink "${script_dir}/gitignore_global" "${HOME}/.gitignore_global"
 }
 
-# Symlink bash dotfiles
 setup_zsh() {
-  symlink ${dir}/zshrc ${HOME}/.zshrc
+  symlink "${script_dir}/zshrc" "${HOME}/.zshrc"
 }
 
-clean_symlinks
 setup_vim
 setup_git
 setup_zsh
 setup_tmux
-setup_prompt
+install_pure_prompt

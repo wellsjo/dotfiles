@@ -3,51 +3,70 @@
 ```
 dotfiles/
 ├── zshrc, vimrc, gitconfig, ...   # macOS configs (default)
-├── wsl/                            # WSL/Linux-specific overrides
-│   └── zshrc                       # Use this instead of root zshrc on WSL
-├── vim/                            # Vim plugins/config
-└── tmux/                           # Tmux config
+├── wsl/                           # Linux/WSL-specific overrides
+│   └── zshrc                      # Use this instead of root zshrc on WSL
+├── vim/                           # Vim plugins/config
+└── tmux/                          # Tmux config
 ```
 
-**Key:** Root configs are for macOS. The `wsl/` directory contains Linux/WSL-specific versions where needed (e.g., `ls` vs `gls`).
+Root configs are for macOS. Use the files in `wsl/` on Linux/WSL where noted.
 
----
+## What this repo manages
 
-## macOS Setup
-
-### Configs
 - zsh
 - vim
 - tmux
 - git
 
-TODO make step by step instructions
+Machine-specific aliases, exports, and secrets should live in `~/.localprofile`.
+That file is sourced automatically and is not managed by this repo.
+
+## macOS setup
 
 ### Dependencies
+
+Install the base tools first:
+
+```bash
+brew install coreutils git go htop icdiff jq nowplaying-cli tmux vim
+brew install --cask font-monaspace-nerd-font font-noto-sans-symbols-2
+```
+
+Then make sure these are installed separately if you use them:
+
 - oh-my-zsh
-- Homebrew
-- vim
-- tmux (brew)
-- tpm https://github.com/tmux-plugins/tpm
-- icdiff (pip)
-- htop (brew)
-- go (brew)
-- nodejs (nvm)
-- pure (https://github.com/sindresorhus/pure)
-- ctags
-- gotags
+- Node.js + npm
+- Pure prompt (`npm install --global pure-prompt`)
+- ctags / gotags if you still want the Vim tag workflows
 
 ### Install
-Paste this in the terminal
+
 ```bash
-git clone git@github.com:wellsjo/dotfiles.git ~/.dotfiles; ~/.dotfiles/setup
+git clone https://github.com/wellsjo/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+./setup
 ```
 
-### Install Nerd Fonts
-Set font to `MonaspaceNe Nerd Font Mono`
-```
-brew install --cask font-monaspace-nerd-font font-noto-sans-symbols-2
-brew install bc coreutils gawk gh glab gsed jq nowplaying-cli
+Use `./setup --force` to replace managed files without prompts.
+
+Then finish the editor/plugin setup manually:
+
+```bash
+vim +PlugInstall +qall
+# inside tmux: prefix + I
 ```
 
-make sure /usr/local/bin comes before /usr/bin in $PATH
+### Notes
+
+- Set your terminal font to `MonaspaceNe Nerd Font Mono`
+- If you keep machine-specific config, put it in `~/.localprofile`
+- Root `zshrc` expects Homebrew to be available on macOS
+
+## WSL setup
+
+See `wsl/README.md`.
+
+## Caveats
+
+- `vimrc` is still a very personal, legacy-heavy Vim setup. It works, but it is not a minimal baseline.
+- The repo is designed to symlink managed files and keep machine-specific overrides in `~/.localprofile`.
