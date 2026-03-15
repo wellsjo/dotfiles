@@ -14,4 +14,4 @@
 	process = git-lfs filter-process
 	required = true
 [init]
-	defaultBranch = main
+	defaultBranch = master
