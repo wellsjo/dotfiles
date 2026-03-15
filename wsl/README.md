@@ -3,7 +3,7 @@
 1. Clone the repo
 
 ```bash
-git clone https://github.com/wellsjo/dotfiles.git ~/.dotfiles
+git clone git@github.com:wellsjo/dotfiles.git ~/.dotfiles
 ```
 
 2. Install dependencies

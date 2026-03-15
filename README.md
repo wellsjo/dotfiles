@@ -42,7 +42,7 @@ Then make sure these are installed separately if you use them:
 ### Install
 
 ```bash
-git clone https://github.com/wellsjo/dotfiles.git ~/.dotfiles
+git clone git@github.com:wellsjo/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./setup
 ```
