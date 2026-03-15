@@ -1,53 +1,64 @@
-## Project Structure
+# dotfiles
 
-```
-dotfiles/
-├── zshrc, vimrc, gitconfig, ...   # macOS configs (default)
-├── wsl/                            # WSL/Linux-specific overrides
-│   └── zshrc                       # Use this instead of root zshrc on WSL
-├── vim/                            # Vim plugins/config
-└── tmux/                           # Tmux config
-```
+## Modes
 
-**Key:** Root configs are for macOS. The `wsl/` directory contains Linux/WSL-specific versions where needed (e.g., `ls` vs `gls`).
+`./setup` is the safe portable default. It installs only:
 
----
+- `~/.vimrc`
+- `~/.vim`
+- `~/.tmux.conf`
+- `~/.gitignore_global`
 
-## macOS Setup
+It does not link `~/.zshrc`, does not link `~/.gitconfig`, and does not run global `npm` installs.
 
-### Configs
-- zsh
-- vim
-- tmux
-- git
+`./setup --full` enables the Wells personal setup on top of that baseline. This preserves the current shell aliases and git behavior, including aliases such as `t`, `ag`, `gs`, `gb`, `ga`, `gd`, `gl`, `gll`, and `gc`.
 
-TODO make step by step instructions
+Managed files are symlinked and existing targets are left alone unless you confirm replacement or pass `--force`.
 
-### Dependencies
-- oh-my-zsh
-- Homebrew
-- vim
-- tmux (brew)
-- tpm https://github.com/tmux-plugins/tpm
-- icdiff (pip)
-- htop (brew)
-- go (brew)
-- nodejs (nvm)
-- pure (https://github.com/sindresorhus/pure)
-- ctags
-- gotags
+## Install
 
-### Install
-Paste this in the terminal
 ```bash
-git clone git@github.com:wellsjo/dotfiles.git ~/.dotfiles; ~/.dotfiles/setup
+git clone git@github.com:wellsjo/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+./setup
 ```
 
-### Install Nerd Fonts
-Set font to `MonaspaceNe Nerd Font Mono`
-```
-brew install --cask font-monaspace-nerd-font font-noto-sans-symbols-2
-brew install bc coreutils gawk gh glab gsed jq nowplaying-cli
+Use `./setup --force` to replace managed files without prompts.
+
+For the Wells personal environment:
+
+```bash
+./setup --full
 ```
 
-make sure /usr/local/bin comes before /usr/bin in $PATH
+Or force it:
+
+```bash
+./setup --full --force
+```
+
+## Platform behavior
+
+- macOS full mode links the root `zshrc` and `gitconfig`
+- WSL full mode links `wsl/zshrc` and `gitconfig` when WSL is confidently detected
+- Generic Linux falls back to the safe baseline instead of guessing at personal shell/git setup
+
+`gitignore_global` is installed in both modes because it is low-risk and portable.
+
+## Dependencies
+
+Baseline setup expects only standard shell tools. Optional follow-up steps:
+
+```bash
+vim +PlugInstall +qall
+# inside tmux: prefix + I
+```
+
+Full mode may also use:
+
+- oh-my-zsh
+- Node.js + npm for `pure-prompt`
+- Homebrew on macOS for the root `zshrc`
+- the WSL dependencies listed in `wsl/README.md`
+
+Machine-specific aliases, exports, and secrets should live in `~/.localprofile`. Both shell configs source it automatically when present.

@@ -270,13 +270,13 @@ Plug 'wellsjo/wellsokai.vim'
 Plug 'NLKNguyen/papercolor-theme'
 function SwitchToLight()
   set background=light
-  colo PaperColor
+  silent! colo PaperColor
 endfunction
 command! SwitchToLight call SwitchToLight()
 
 function SwitchToDark()
   set background=dark
-  colo wellsokai
+  silent! colo wellsokai
 endfunction
 command! SwitchToDark call SwitchToDark()
 
@@ -327,4 +327,4 @@ call plug#end()
 
 " Call functions that need Plug loaded...
 
-colo wellsokai
+silent! colo wellsokai
