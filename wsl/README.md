@@ -26,16 +26,16 @@ git clone https://github.com/sindresorhus/pure.git "$HOME/.zsh/pure"
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
-5. Link configs
+5. Run the installer
+
+For the full Wells setup on WSL, use:
 
 ```bash
-ln -s ~/.dotfiles/wsl/zshrc ~/.zshrc
-ln -s ~/.dotfiles/vimrc ~/.vimrc
-ln -s ~/.dotfiles/vim ~/.vim
-ln -s ~/.dotfiles/tmux/tmux.conf ~/.tmux.conf
-ln -s ~/.dotfiles/gitconfig ~/.gitconfig
-ln -s ~/.dotfiles/gitignore_global ~/.gitignore_global
+cd ~/.dotfiles
+./setup --full
 ```
+
+Default `./setup` stays on the portable baseline and does not link `~/.zshrc` or `~/.gitconfig`.
 
 6. Install vim plugins
 

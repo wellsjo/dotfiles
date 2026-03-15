@@ -1,45 +1,21 @@
-## Project Structure
+# dotfiles
 
-```
-dotfiles/
-├── zshrc, vimrc, gitconfig, ...   # macOS configs (default)
-├── wsl/                           # Linux/WSL-specific overrides
-│   └── zshrc                      # Use this instead of root zshrc on WSL
-├── vim/                           # Vim plugins/config
-└── tmux/                          # Tmux config
-```
+## Modes
 
-Root configs are for macOS. Use the files in `wsl/` on Linux/WSL where noted.
+`./setup` is the safe portable default. It installs only:
 
-## What this repo manages
+- `~/.vimrc`
+- `~/.vim`
+- `~/.tmux.conf`
+- `~/.gitignore_global`
 
-- zsh
-- vim
-- tmux
-- git
+It does not link `~/.zshrc`, does not link `~/.gitconfig`, and does not run global `npm` installs.
 
-Machine-specific aliases, exports, and secrets should live in `~/.localprofile`.
-That file is sourced automatically and is not managed by this repo.
+`./setup --full` enables the Wells personal setup on top of that baseline. This preserves the current shell aliases and git behavior, including aliases such as `t`, `ag`, `gs`, `gb`, `ga`, `gd`, `gl`, `gll`, and `gc`.
 
-## macOS setup
+Managed files are symlinked and existing targets are left alone unless you confirm replacement or pass `--force`.
 
-### Dependencies
-
-Install the base tools first:
-
-```bash
-brew install coreutils git go htop icdiff jq nowplaying-cli tmux vim
-brew install --cask font-monaspace-nerd-font font-noto-sans-symbols-2
-```
-
-Then make sure these are installed separately if you use them:
-
-- oh-my-zsh
-- Node.js + npm
-- Pure prompt (`npm install --global pure-prompt`)
-- ctags / gotags if you still want the Vim tag workflows
-
-### Install
+## Install
 
 ```bash
 git clone git@github.com:wellsjo/dotfiles.git ~/.dotfiles
@@ -49,24 +25,40 @@ cd ~/.dotfiles
 
 Use `./setup --force` to replace managed files without prompts.
 
-Then finish the editor/plugin setup manually:
+For the Wells personal environment:
+
+```bash
+./setup --full
+```
+
+Or force it:
+
+```bash
+./setup --full --force
+```
+
+## Platform behavior
+
+- macOS full mode links the root `zshrc` and `gitconfig`
+- WSL full mode links `wsl/zshrc` and `gitconfig` when WSL is confidently detected
+- Generic Linux falls back to the safe baseline instead of guessing at personal shell/git setup
+
+`gitignore_global` is installed in both modes because it is low-risk and portable.
+
+## Dependencies
+
+Baseline setup expects only standard shell tools. Optional follow-up steps:
 
 ```bash
 vim +PlugInstall +qall
 # inside tmux: prefix + I
 ```
 
-### Notes
+Full mode may also use:
 
-- Set your terminal font to `MonaspaceNe Nerd Font Mono`
-- If you keep machine-specific config, put it in `~/.localprofile`
-- Root `zshrc` expects Homebrew to be available on macOS
+- oh-my-zsh
+- Node.js + npm for `pure-prompt`
+- Homebrew on macOS for the root `zshrc`
+- the WSL dependencies listed in `wsl/README.md`
 
-## WSL setup
-
-See `wsl/README.md`.
-
-## Caveats
-
-- `vimrc` is still a very personal, legacy-heavy Vim setup. It works, but it is not a minimal baseline.
-- The repo is designed to symlink managed files and keep machine-specific overrides in `~/.localprofile`.
+Machine-specific aliases, exports, and secrets should live in `~/.localprofile`. Both shell configs source it automatically when present.

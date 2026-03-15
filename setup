@@ -5,12 +5,16 @@ set -euo pipefail
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 force=false
 
+mode="baseline"
+
 usage() {
   cat <<'EOF'
-Usage: ./setup [--force] [--help]
+Usage: ./setup [--force] [--full|--wells] [--help]
 
 Options:
   --force   Replace managed files without prompting
+  --full    Install Wells personal shell/git config in addition to the baseline
+  --wells   Alias for --full
   --help    Show this help message
 EOF
 }
@@ -19,6 +23,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --force)
       force=true
+      ;;
+    --full|--wells)
+      mode="full"
       ;;
     -h|--help)
       usage
@@ -124,17 +131,68 @@ setup_tmux() {
   echo "TPM installed. Start tmux and press prefix + I to install tmux plugins."
 }
 
+is_confident_wsl() {
+  [[ -n "${WSL_DISTRO_NAME:-}" || -n "${WSL_INTEROP:-}" ]] && return 0
+  [[ -r /proc/sys/kernel/osrelease ]] && grep -qiE '(microsoft|wsl)' /proc/sys/kernel/osrelease
+}
+
+supports_full_personal_config() {
+  case "$(uname -s)" in
+    Darwin)
+      return 0
+      ;;
+    Linux)
+      is_confident_wsl
+      return
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 setup_git() {
-  symlink "${script_dir}/gitconfig" "${HOME}/.gitconfig"
   symlink "${script_dir}/gitignore_global" "${HOME}/.gitignore_global"
+
+  if [[ "$mode" == "full" ]]; then
+    if supports_full_personal_config; then
+      symlink "${script_dir}/gitconfig" "${HOME}/.gitconfig"
+    else
+      echo "Skipping git config: full mode only installs personal config on macOS or confident WSL"
+    fi
+  fi
 }
 
 setup_zsh() {
-  symlink "${script_dir}/zshrc" "${HOME}/.zshrc"
+  local zsh_source=""
+
+  case "$(uname -s)" in
+    Darwin)
+      zsh_source="${script_dir}/zshrc"
+      ;;
+    Linux)
+      if is_confident_wsl; then
+        zsh_source="${script_dir}/wsl/zshrc"
+      else
+        echo "Skipping zsh config: full mode only installs shell config on macOS or confident WSL"
+        return 1
+      fi
+      ;;
+    *)
+      echo "Skipping zsh config: unsupported platform for Wells shell setup"
+      return 1
+      ;;
+  esac
+
+  symlink "${zsh_source}" "${HOME}/.zshrc"
 }
 
 setup_vim
 setup_git
-setup_zsh
 setup_tmux
-install_pure_prompt
+
+if [[ "$mode" == "full" ]]; then
+  if setup_zsh; then
+    install_pure_prompt
+  fi
+fi
